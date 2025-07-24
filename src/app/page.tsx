@@ -1,103 +1,161 @@
-import Image from "next/image";
+'use client';
+
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Eye, Edit3, Smartphone, Monitor } from 'lucide-react';
+import { Editor } from '@/components/Editor';
+import { PreviewPane } from '@/components/PreviewPane';
+import { useProfileStore } from '@/lib/store';
+import { cn } from '@/utils';
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const { profile, deleteLink, toggleLinkActive } = useProfileStore();
+  const [previewMode, setPreviewMode] = useState<'mobile' | 'desktop'>('mobile');
+  const [showMobilePreview, setShowMobilePreview] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  return (
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+      {/* Header */}
+      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold">
+              L
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Linkora
+            </h1>
+            <span className="text-sm text-gray-500 dark:text-gray-400 hidden sm:inline">
+              Link-in-Bio Page Builder
+            </span>
+          </div>
+          
+          {/* Mobile preview toggle (for smaller screens) */}
+          <div className="flex items-center gap-2">
+            <div className="lg:hidden">
+              <button
+                onClick={() => setShowMobilePreview(!showMobilePreview)}
+                className={cn(
+                  'flex items-center gap-2 px-3 py-2 rounded-lg transition-colors',
+                  showMobilePreview 
+                    ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
+                    : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+                )}
+              >
+                {showMobilePreview ? <Edit3 className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showMobilePreview ? 'Edit' : 'Preview'}
+              </button>
+            </div>
+            
+            {/* Desktop preview mode toggle */}
+            <div className="hidden lg:flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+              <button
+                onClick={() => setPreviewMode('mobile')}
+                className={cn(
+                  'flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors',
+                  previewMode === 'mobile'
+                    ? 'bg-white dark:bg-gray-600 shadow-sm'
+                    : 'hover:bg-gray-200 dark:hover:bg-gray-600'
+                )}
+              >
+                <Smartphone className="w-4 h-4" />
+                Mobile
+              </button>
+              <button
+                onClick={() => setPreviewMode('desktop')}
+                className={cn(
+                  'flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors',
+                  previewMode === 'desktop'
+                    ? 'bg-white dark:bg-gray-600 shadow-sm'
+                    : 'hover:bg-gray-200 dark:hover:bg-gray-600'
+                )}
+              >
+                <Monitor className="w-4 h-4" />
+                Desktop
+              </button>
+            </div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+      </header>
+
+      {/* Main Content */}
+      <div className="flex h-[calc(100vh-73px)]">
+        {/* Editor Panel */}
+        <div className={cn(
+          'flex-1 border-r border-gray-200 dark:border-gray-700',
+          'lg:flex lg:max-w-md xl:max-w-lg',
+          showMobilePreview && 'hidden lg:flex'
+        )}>
+          <Editor />
+        </div>
+
+        {/* Preview Panel */}
+        <div className={cn(
+          'flex-1 relative',
+          !showMobilePreview && 'hidden lg:block'
+        )}>
+          {/* Preview Container */}
+          <div className="h-full flex items-center justify-center bg-gray-50 dark:bg-gray-800 p-4">
+            <motion.div
+              key={previewMode}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+              className={cn(
+                'bg-white dark:bg-gray-900 shadow-2xl overflow-hidden',
+                previewMode === 'mobile' 
+                  ? 'w-full max-w-sm h-full max-h-[812px] rounded-3xl border-8 border-gray-800'
+                  : 'w-full h-full rounded-lg border border-gray-200 dark:border-gray-700'
+              )}
+            >
+              {/* Phone-style header (mobile preview only) */}
+              {previewMode === 'mobile' && (
+                <div className="bg-gray-800 h-6 flex items-center justify-center">
+                  <div className="w-16 h-1 bg-gray-600 rounded-full"></div>
+                </div>
+              )}
+              
+              {/* Preview Content */}
+              <div className="h-full overflow-hidden">
+                <PreviewPane
+                  profile={profile}
+                  isEditMode={true}
+                  onLinkEdit={(linkId) => {
+                    // This could trigger a modal or navigate to edit mode
+                    console.log('Edit link:', linkId);
+                  }}
+                  onLinkDelete={deleteLink}
+                  onLinkToggleActive={toggleLinkActive}
+                  className={previewMode === 'mobile' ? 'h-full' : 'h-full'}
+                />
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Preview Mode Label */}
+          <div className="absolute top-4 right-4 hidden lg:block">
+            <div className="bg-black/70 text-white px-3 py-1 rounded-full text-sm backdrop-blur-sm">
+              {previewMode === 'mobile' ? 'Mobile Preview' : 'Desktop Preview'}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile: Floating action button to switch between edit/preview */}
+      <div className="lg:hidden fixed bottom-6 right-6 z-50">
+        <motion.button
+          onClick={() => setShowMobilePreview(!showMobilePreview)}
+          className="w-14 h-14 bg-blue-500 text-white rounded-full shadow-lg flex items-center justify-center"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          {showMobilePreview ? (
+            <Edit3 className="w-6 h-6" />
+          ) : (
+            <Eye className="w-6 h-6" />
+          )}
+        </motion.button>
+      </div>
     </div>
   );
 }
